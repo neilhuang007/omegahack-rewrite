@@ -15,6 +15,7 @@ import keystrokesmod.client.utils.Utils;
 import keystrokesmod.client.utils.client.PacketUtil;
 import keystrokesmod.client.utils.player.EnumFacingOffset;
 import keystrokesmod.client.utils.player.InventoryUtils;
+import keystrokesmod.client.utils.player.MovementUtils;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -67,6 +68,7 @@ public class Sccafold extends Module {
 
     // enable and disable
     public void onEnable() {
+        y = 80;
     }
 
 
@@ -76,12 +78,7 @@ public class Sccafold extends Module {
 
     private static boolean shouldBridge = false;
 
-
-    private EnumFacingOffset enumFacing;
-
-    private BlockPos blockFace;
-
-    private BlockData data;
+    private BlockData data = null;
 
     //place func
 
@@ -90,6 +87,7 @@ public class Sccafold extends Module {
             if (placedelay.hasFinished()) {
                 mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), this.data.getBlockPos(), this.data.getEnumFacing(), getVec3(this.data.getBlockPos(), this.data.getEnumFacing()));
                 mc.thePlayer.swingItem();
+                y = (float) randomNumber(79.5f, 83.5f);
             }
         }
     }
@@ -350,23 +348,7 @@ public class Sccafold extends Module {
         return Math.random() * (max - min) + min;
     }
 
-    private static class BlockData {
-        private final BlockPos pos;
-        private final EnumFacing facing;
 
-        public BlockData(final BlockPos pos, final EnumFacing facing) {
-            this.pos = pos;
-            this.facing = facing;
-        }
-
-        public BlockPos getBlockPos() {
-            return this.pos;
-        }
-
-        public EnumFacing getEnumFacing() {
-            return this.facing;
-        }
-    }
 
     // shifting
 
@@ -385,6 +367,21 @@ public class Sccafold extends Module {
 
     }
 
+    // rotation
+
+    // variables
+    //private static final Rotation rotation = new Rotation(999.0f, 999.0f);
+    float yaw, pitch = 96;
+    private float y;
+
+    private void rotation(){
+        mc.thePlayer.rotationYawHead = yaw;
+        mc.thePlayer.renderYawOffset = mc.thePlayer.rotationYaw - 180;
+        rotation.setYaw(mc.thePlayer.rotationYaw - 180);
+        rotation.setPitch(86.66f);
+    }
+
+
         // main func
 
     @SubscribeEvent
@@ -397,32 +394,6 @@ public class Sccafold extends Module {
 
 
         if(legit.isToggled()) {
-//            if(legit.isToggled()) {
-//                if(mc.thePlayer.rotationPitch < pitchRange.getInputMin() || mc.thePlayer.rotationPitch > pitchRange.getInputMax()) {
-//                    shouldBridge = false;
-//                    if(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())) {
-//                        setShift(true);
-//                    }
-//                    return;
-//                }
-//            }
-//            if (onHold) {
-//                if  (!Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())) {
-//                    shouldBridge = false;
-//                    return;
-//                }
-//            }
-//
-//            if (blocksOnly.isToggled()) {
-//                ItemStack i = mc.thePlayer.getHeldItem();
-//                if (i == null || !(i.getItem() instanceof ItemBlock)) {
-//                    if (isShifting) {
-//                        isShifting = false;
-//                        this.setShift(false);
-//                    }
-//
-//                    return;
-//                }
             }
 
             if (mc.thePlayer.onGround) {
@@ -473,6 +444,64 @@ public class Sccafold extends Module {
                 this.setShift(false);
             }
         }
+
+        // post
+
+    @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+    public void s(net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent post) {
+
+        double posY, yDif;
+        for (posY = mc.thePlayer.posY - 1.0D; posY > 0.0D; posY--) {
+            BlockData newData = getBlockData(new BlockPos(mc.thePlayer.posX, posY, mc.thePlayer.posZ));
+            if (newData != null) {
+                yDif = mc.thePlayer.posY - posY;
+                if (yDif <= 3.0D) {
+                    data = newData;
+                    break;
+                }
+            }
+        }
+        if(data != null){
+            if (data.facing == EnumFacing.UP) {
+                yaw = 90;
+            } else if (data.facing == EnumFacing.NORTH) {
+                yaw = 360;
+            } else if (data.facing == EnumFacing.EAST) {
+                yaw = 90;
+            } else if (data.facing == EnumFacing.SOUTH) {
+                yaw = 180;
+            } else if (data.facing == EnumFacing.WEST) {
+                yaw = 270;
+            } else {
+                yaw = 90;
+            }
+        }
+
+
+        if(!legit.isToggled()){
+            rotation();
+        }
+    }
+
+    // blockdata
+
+    private static class BlockData {
+        private final BlockPos pos;
+        private final EnumFacing facing;
+
+        public BlockData(final BlockPos pos, final EnumFacing facing) {
+            this.pos = pos;
+            this.facing = facing;
+        }
+
+        public BlockPos getBlockPos() {
+            return this.pos;
+        }
+
+        public EnumFacing getEnumFacing() {
+            return this.facing;
+        }
+    }
 
 
 }
