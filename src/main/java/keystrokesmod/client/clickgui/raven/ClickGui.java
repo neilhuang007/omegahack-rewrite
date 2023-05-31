@@ -111,7 +111,7 @@ public class ClickGui extends GuiScreen {
    TimerUtil valuetimer = new TimerUtil();
 
    public float smoothTrans(double current, double last){
-      return (float) (current + (last - current) / (Minecraft.getDebugFPS() / 10));
+      return (float) (current + (last - current) / (Minecraft.getDebugFPS() / 2));
    }
 
    @Override
