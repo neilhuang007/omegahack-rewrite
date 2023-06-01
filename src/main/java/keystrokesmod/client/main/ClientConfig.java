@@ -16,6 +16,8 @@ public class ClientConfig {
    private static final Minecraft mc = Minecraft.getMinecraft();
    private final File configFile;
    private final File configDir;
+
+   public static boolean applyingConfig;
    private final String fileName = "config";
    private final String hypixelApiKeyPrefix = "hypixel-api~ ";
    private final String pasteApiKeyPrefix = "paste-api~ ";
@@ -137,6 +139,7 @@ public class ClientConfig {
    }
 
    public void applyConfig(){
+      applyingConfig = true;
       List<String> config = this.parseConfigFile();
 
       for(String line : config){
@@ -188,6 +191,7 @@ public class ClientConfig {
             } catch (Exception e){}
          }
       }
+      applyingConfig = false;
    }
 
    private List<String> parseConfigFile() {

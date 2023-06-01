@@ -1,6 +1,8 @@
 package keystrokesmod.client.main;
 
 //import keystrokesmod.client.clickgui.vape.VapeClickGui;
+import com.google.common.eventbus.EventBus;
+import keystrokesmod.client.notifications.NotificationRenderer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import keystrokesmod.client.utils.version.VersionManager;
 import keystrokesmod.client.clickgui.raven.ClickGui;
@@ -71,6 +73,8 @@ public class Raven {
 
    public static ResourceLocation mResourceLocation;
 
+   public static final EventBus eventBus = new EventBus();
+
    public static final String osName, osArch;
 
 
@@ -80,7 +84,7 @@ public class Raven {
    }
 
    public static void init() {
-
+      eventBus.register(NotificationRenderer.notificationRenderer);
       MinecraftForge.EVENT_BUS.register(new Raven());
       MinecraftForge.EVENT_BUS.register(new DebugInfoRenderer());
       MinecraftForge.EVENT_BUS.register(new MouseManager());
